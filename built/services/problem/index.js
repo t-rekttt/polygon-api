@@ -20,3 +20,7 @@ const setValidator_1 = require("./setValidator");
 exports.setValidator = setValidator_1.setValidator;
 const updateInfo_1 = require("./updateInfo");
 exports.updateInfo = updateInfo_1.updateInfo;
+const saveTest_1 = require("./saveTest");
+exports.saveTest = saveTest_1.saveTest;
+const giveAccess_1 = require("./giveAccess");
+exports.giveAccess = giveAccess_1.giveAccess;
