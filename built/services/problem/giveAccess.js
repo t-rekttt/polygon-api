@@ -8,8 +8,6 @@ async function giveAccess(problemId, userName) {
 
             const continueEditRequest = await requestPolygon('edit-start', { params: { problemId } });
 
-            console.log(continueEditRequest.headers)
-
             let session = new URL(continueEditRequest.headers.location).searchParams.get('session');
 
             const formData = {
