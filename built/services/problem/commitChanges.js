@@ -1,5 +1,5 @@
 const requester = require("../init-requester");
-async function giveAccess(problemId, userName, permission = 'Read') {
+async function commitChanges(problemId, message = `Commited by VOJBOT at ${new Date()}`) {
     let polygonRequester = await requester;
 
     while (true) {
@@ -10,19 +10,19 @@ async function giveAccess(problemId, userName, permission = 'Read') {
 
             const formData = {
                 submitted: 'true',
-                users_added: userName,
-                type: permission,
+                message,
+                allContests: 'true',
                 session
             };
 
-            const response = await polygonRequester.requestUnofficial('access', { method: 'POST', formData, qs: { action: 'add' } });
+            const response = await polygonRequester.requestUnofficial('edit-commit', { method: 'POST', formData, qs: { action: 'add' } });
 
-            return {
-                success: response.headers.location && response.headers.location.indexOf('access') !== -1
-            };
+            if (!response.headers.location || response.headers.location.indexOf('generalInfo') === -1) return false;
+
+            return true;
         } catch (err) {
             console.log(err);
         }
     }
 }
-module.exports = giveAccess;
+module.exports = commitChanges;
