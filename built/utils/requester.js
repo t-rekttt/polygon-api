@@ -11,6 +11,9 @@ class PolygonRequester {
         this.password = password;
 
         this.request = request.defaults({
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
+            },
             baseUrl: 'https://polygon.codeforces.com/',
             json: true,
             simple: false,
@@ -34,14 +37,13 @@ class PolygonRequester {
             return false;
         this.ccid = ccid;
         const formData = {
-            ccid,
             login,
             password,
             submit: 'Login',
             submitted: 'true',
             fp: 'a92fdda7ac4f88ec7f7a8b28231cdd04'
         };
-        const { statusCode } = await this.request('login', { method: 'POST', formData });
+        const { statusCode, headers } = await this.request('login', { method: 'POST', formData, qs: { ccid } });
         if (statusCode !== 302) {
             logger.logger('Invalid credentials!', { error: true });
             return process.exit(1);
@@ -49,7 +51,9 @@ class PolygonRequester {
         return this;
     }
 
-    async requestUnofficial(methodName = '', options) {
+    async requestUnofficial(methodName = '', options = {}) {
+        if (options.qs) options.qs.ccid = this.ccid;
+        else options.qs = { ccid: this.ccid };
         return this.request(methodName, options);
     }
 
@@ -59,8 +63,6 @@ class PolygonRequester {
             time: Math.round(new Date().getTime() / 1000).toString(),
             ...options.formData
         };
-        console.log(this.makeQueryString(formData));
-        console.log(formData);
         formData['apiSig'] = this.makeApiSig(methodName, this.makeQueryString(formData), this.API_SECRET);
         return this.request(`api/${methodName}`, { ...options, formData });
     }
