@@ -1,8 +1,8 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const requestAPI_1 = require("../init-requester/requestAPI");
+const requester = require("../init-requester");
 async function getProblemList() {
-    const { body } = await requestAPI_1.requestAPI('problems.list');
+    let polygonRequester = await requester;
+    const { body } = await polygonRequester.requestOfficial('problems.list');
     return body.status === 'OK'
         ? body.result.map((p) => {
             return {
@@ -14,4 +14,4 @@ async function getProblemList() {
         })
         : [];
 }
-exports.getProblemList = getProblemList;
+module.exports = getProblemList;

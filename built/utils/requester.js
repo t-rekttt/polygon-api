@@ -1,75 +1,89 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const crypto_1 = __importDefault(require("crypto"));
-const url_1 = require("url");
-const request_promise_1 = __importDefault(require("request-promise"));
-const baseRequester = request_promise_1.default.defaults({
-    baseUrl: 'https://polygon.codeforces.com/',
-    json: true,
-    simple: false,
-    resolveWithFullResponse: true
-});
-function makeQueryString(query) {
-    let queryString = '';
-    let keys = Object.keys(query).sort();
-    for (const key of keys) {
-        queryString += `&${key}=${query[key]}`;
+const request = require('request-promise');
+const logger = require('./logger');
+const crypto = require('crypto');
+
+class PolygonRequester {
+    constructor(username, password, API_KEY, API_SECRET) {
+        this.API_KEY = API_KEY;
+        this.API_SECRET = API_SECRET;
+        this.username = username;
+        this.password = password;
+
+        this.request = request.defaults({
+            baseUrl: 'https://polygon.codeforces.com/',
+            json: true,
+            simple: false,
+            resolveWithFullResponse: true,
+            followRedirect: false,
+            jar: true,
+            // proxy: 'http://localhost:8888',
+            // strictSSL: false
+        });
     }
-    return queryString.slice(1);
-}
-function makeApiSig(methodName, query, secret) {
-    const rand = Math.random()
-        .toString(36)
-        .substring(2, 8);
-    return (rand +
-        crypto_1.default
-            .createHash('sha512')
-            .update(`${rand}/${methodName}?${query}#${secret}`, 'utf8')
-            .digest('hex'));
-}
-function makeRequesterOnCredential(apiKey) {
-    return async function makeRequest(methodName = '', params) {
+
+    async init() {
+        return await this.login(this.username, this.password);
+    }
+
+    async login(login, password) {
+        logger.logger('Login to Codeforces Polygon...');
+        let r = await this.request('login');
+        const { ccid } = this.extractCCID(r.body);
+        if (!ccid)
+            return false;
+        this.ccid = ccid;
+        const formData = {
+            ccid,
+            login,
+            password,
+            submit: 'Login',
+            submitted: 'true',
+            fp: 'a92fdda7ac4f88ec7f7a8b28231cdd04'
+        };
+        const { statusCode } = await this.request('login', { method: 'POST', formData });
+        if (statusCode !== 302) {
+            logger.logger('Invalid credentials!', { error: true });
+            return process.exit(1);
+        }
+        return this;
+    }
+
+    async requestUnofficial(methodName = '', options) {
+        return this.request(methodName, options);
+    }
+
+    async requestOfficial(methodName, options = { formData: {}, method: 'POST' }) {
         let formData = {
-            apiKey: apiKey.key,
-            time: Math.round(new Date().getTime() / 1000).toString()
+            apiKey: this.API_KEY,
+            time: Math.round(new Date().getTime() / 1000).toString(),
+            ...options.formData
         };
-        if (params) {
-            for (let [key, value] of Object.entries(params)) {
-                formData[key] = value;
-            }
-        }
-        formData['apiSig'] = makeApiSig(methodName, makeQueryString(formData), apiKey.secret);
-        return baseRequester.post(`api/${methodName}`, { formData });
-    };
+        console.log(this.makeQueryString(formData));
+        console.log(formData);
+        formData['apiSig'] = this.makeApiSig(methodName, this.makeQueryString(formData), this.API_SECRET);
+        return this.request(`api/${methodName}`, { ...options, formData });
+    }
+
+    makeQueryString(query = {}) {
+        return Object.keys(query).sort().reduce((curr, key) => curr + `&${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`, '').slice(1);
+    }
+
+    makeApiSig(methodName, query, secret) {
+        const rand = Math.random()
+            .toString(36)
+            .substring(2, 8);
+        return (rand +
+            crypto
+                .createHash('sha512')
+                .update(`${rand}/${methodName}?${query}#${secret}`, 'utf8')
+                .digest('hex'));
+    }
+
+    extractCCID(text) {
+        const match = text.match(/name="ccid" content="(.*?)"/);
+        return { ccid: match ? match[1] : null };
+    }
 }
-exports.makeRequesterOnCredential = makeRequesterOnCredential;
-function makeDefaultRequester({ cookie, ccid } = {}) {
-    return async function makeRequest(methodName = '', { formData, params } = {}) {
-        const query = new url_1.URLSearchParams();
-        if (ccid) {
-            query.append('ccid', ccid);
-            if (formData) {
-                formData = Object.assign(Object.assign({}, formData), { ccid });
-            }
-        }
-        if (params) {
-            for (let [key, value] of Object.entries(params)) {
-                query.append(key, value);
-            }
-        }
-        const endpoint = `${methodName}?${makeQueryString(query)}`;
-        const headers = {
-            cookie,
-            origin: 'https://polygon.codeforces.com',
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36'
-        };
-        const options = { headers };
-        return formData
-            ? baseRequester.post(endpoint, options).form(formData)
-            : baseRequester.get(endpoint, options);
-    };
-}
-exports.makeDefaultRequester = makeDefaultRequester;
+
+module.exports = PolygonRequester;
