@@ -1,14 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const requestAPI_1 = require("../init-requester/requestAPI");
+const requester = require("../init-requester");
 async function setChecker(problemId, { checker }) {
+    let polygonRequester = await requester;
+
     while (true) {
         try {
-            const params = {
+            const formData = {
                 problemId,
                 checker
             };
-            const { body } = await requestAPI_1.requestAPI('problem.setChecker', params);
+            const { body } = await polygonRequester.requestOfficial('problem.setChecker', formData);
             return body && body.status === 'OK';
         } catch (err) {
             console.log(err);

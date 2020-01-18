@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const requestAPI_1 = require("../init-requester/requestAPI");
+const requester = require("../init-requester");
 async function saveSolution(problemId, { checkExisting, name, file, sourceType, tag }) {
+    let polygonRequester = await requester;
+
     while (true) {
         try {
-            const params = JSON.parse(JSON.stringify({
+            const formData = JSON.parse(JSON.stringify({
                 problemId,
                 checkExisting,
                 name,
@@ -12,7 +14,7 @@ async function saveSolution(problemId, { checkExisting, name, file, sourceType, 
                 sourceType,
                 tag
             }));
-            const { body } = await requestAPI_1.requestAPI('problem.saveSolution', params);
+            const { body } = await polygonRequester.requestOfficial('problem.saveSolution', { formData });
             return body && body.status === 'OK';
         } catch (err) {
             console.log(err);

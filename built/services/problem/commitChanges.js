@@ -1,4 +1,5 @@
 const requester = require("../init-requester");
+Object.defineProperty(exports, "__esModule", { value: true });
 async function commitChanges(problemId, message = `Commited by VOJBOT at ${new Date()}`) {
     let polygonRequester = await requester;
 
@@ -25,4 +26,4 @@ async function commitChanges(problemId, message = `Commited by VOJBOT at ${new D
         }
     }
 }
-module.exports = commitChanges;
+exports.commitChanges = commitChanges;

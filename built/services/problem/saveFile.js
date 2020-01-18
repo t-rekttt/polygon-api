@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const requestAPI_1 = require("../init-requester/requestAPI");
+const requester = require("../init-requester");
 async function saveFile(problemId, { checkExisting, type, name, file, sourceType }) {
-    const params = JSON.parse(JSON.stringify({
+    let polygonRequester = await requester;
+
+    const formData = JSON.parse(JSON.stringify({
         problemId,
         checkExisting,
         type,
@@ -10,7 +12,7 @@ async function saveFile(problemId, { checkExisting, type, name, file, sourceType
         file,
         sourceType
     }));
-    const { body } = await requestAPI_1.requestAPI('problem.saveFile', params);
+    const { body } = await polygonRequester.requestUnofficial('problem.saveFile', { formData });
     return body && body.status === 'OK';
 }
 exports.saveFile = saveFile;

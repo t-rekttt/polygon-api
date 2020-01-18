@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const requestAPI_1 = require("../init-requester/requestAPI");
+const requester = require("../init-requester");
 async function updateInfo(problemId, { inputFile, outputFile, interactive, timeLimit, memoryLimit } = {}) {
-    const params = JSON.parse(JSON.stringify({
+    let polygonRequester = await requester;
+
+    const formData = JSON.parse(JSON.stringify({
         inputFile,
         outputFile,
         interactive,
@@ -10,7 +12,7 @@ async function updateInfo(problemId, { inputFile, outputFile, interactive, timeL
         memoryLimit,
         problemId
     }));
-    const { body } = await requestAPI_1.requestAPI('problem.updateInfo', params);
+    const { body } = await polygonRequester.requestOfficial('problem.updateInfo', { formData });
     return body && body.status === 'OK';
 }
 exports.updateInfo = updateInfo;

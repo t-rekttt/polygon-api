@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const requestPolygon_1 = require("../init-requester/requestPolygon");
+const requester = require("../init-requester");
 async function createProblem(problemName) {
+    let polygonRequester = await requester;
+
     while (true) {
         try {
-            const { requestPolygon } = await requestPolygon_1.makeRequestPolygon;
-
             const formData = {
                 name: problemName.toLowerCase(),
                 submit: 'Create',
                 submitted: 'true'
             };
 
-            const response = await requestPolygon('cp', { formData });
+            const response = await polygonRequester.requestUnofficial('cp', { formData });
 
             return {
                 success: response.headers.location.indexOf('/problems') !== -1

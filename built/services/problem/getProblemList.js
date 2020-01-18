@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const requester = require("../init-requester");
 async function getProblemList() {
     let polygonRequester = await requester;
@@ -7,4 +8,4 @@ async function getProblemList() {
         ? body.result
         : [];
 }
-module.exports = getProblemList;
+exports.getProblemList = getProblemList;

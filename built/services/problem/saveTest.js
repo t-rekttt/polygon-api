@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const requestAPI_1 = require("../init-requester/requestAPI");
+const requester = require("../init-requester");
 async function saveTest(problemId, { checkExisting, testset, testIndex, testInput, testGroup, testPoints, testDescription, testUseInStatements, testInputForStatements, testOutputForStatements, verifyInputOutputForStatements } = {}) {
+    let polygonRequester = await requester;
+
     while (true) {
         try {
-            const params = JSON.parse(JSON.stringify({
+            const formData = JSON.parse(JSON.stringify({
                 problemId,
                 checkExisting,
                 testset,
@@ -18,7 +20,7 @@ async function saveTest(problemId, { checkExisting, testset, testIndex, testInpu
                 testOutputForStatements,
                 verifyInputOutputForStatements
             }));
-            const { body } = await requestAPI_1.requestAPI('problem.saveTest', params);
+            const { body } = await polygonRequester.requestOfficial('problem.saveTest', { formData });
             return body && body.status === 'OK';
         } catch (err) {
             console.log(err);

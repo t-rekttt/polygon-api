@@ -1,12 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const requestAPI_1 = require("../init-requester/requestAPI");
+const requester = require("../init-requester");
 async function setValidator(problemId, { validator }) {
-    const params = {
+    let polygonRequester = await requester;
+
+    const formData = {
         problemId,
         validator
     };
-    const { body } = await requestAPI_1.requestAPI('problem.setValidator', params);
+    const { body } = await polygonRequester.requestOfficial('problem.setValidator', { formData });
     return body && body.status === 'OK';
 }
 exports.setValidator = setValidator;
