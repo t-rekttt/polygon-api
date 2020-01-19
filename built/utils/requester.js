@@ -20,8 +20,8 @@ class PolygonRequester {
             resolveWithFullResponse: true,
             followRedirect: false,
             jar: true,
-            proxy: 'http://localhost:8080',
-            strictSSL: false
+            // proxy: 'http://localhost:8080',
+            // strictSSL: false
         });
     }
 
