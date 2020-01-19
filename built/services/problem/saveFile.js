@@ -12,7 +12,7 @@ async function saveFile(problemId, { checkExisting, type, name, file, sourceType
         file,
         sourceType
     }));
-    const { body } = await polygonRequester.requestUnofficial('problem.saveFile', { formData });
+    const { body } = await polygonRequester.requestOfficial('problem.saveFile', { formData });
     return body && body.status === 'OK';
 }
 exports.saveFile = saveFile;

@@ -26,3 +26,7 @@ const giveAccess_1 = require("./giveAccess");
 exports.giveAccess = giveAccess_1.giveAccess;
 const commitChanges_1 = require("./commitChanges");
 exports.commitChanges = commitChanges_1.commitChanges;
+const saveProblemProperties_1 = require("./saveProblemProperties");
+exports.saveProblemProperties = saveProblemProperties_1.saveProblemProperties;
+const getTests_1 = require("./getTests");
+exports.getTests = getTests_1.getTests;

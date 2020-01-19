@@ -20,8 +20,8 @@ class PolygonRequester {
             resolveWithFullResponse: true,
             followRedirect: false,
             jar: true,
-            // proxy: 'http://localhost:8888',
-            // strictSSL: false
+            proxy: 'http://localhost:8080',
+            strictSSL: false
         });
     }
 
@@ -51,9 +51,9 @@ class PolygonRequester {
         return this;
     }
 
-    async requestUnofficial(methodName = '', options = {}) {
-        if (options.qs) options.qs.ccid = this.ccid;
-        else options.qs = { ccid: this.ccid };
+    async requestUnofficial(methodName = '', options = { formData: {}, qs: {} }) {
+        if (!options.formData.session) options.formData = { ...options.formData, session: await this.getSessionId(options.formData.problemId) };
+        options.qs = { ...options.qs, ccid: this.ccid };
         return this.request(methodName, options);
     }
 
@@ -65,6 +65,14 @@ class PolygonRequester {
         };
         formData.apiSig = this.makeApiSig(methodName, this.makeQueryString(formData), this.API_SECRET);
         return this.request(`api/${methodName}`, { ...options, method: 'POST', formData });
+    }
+
+    async getSessionId(problemId) {
+        const continueEditRequest = await this.request('edit-start', { method: 'POST', formData: { problemId }, qs: { ccid: this.ccid } });
+
+        let session = new URL(continueEditRequest.headers.location).searchParams.get('session');
+
+        return session;
     }
 
     makeQueryString(query = {}) {
