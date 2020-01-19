@@ -11,13 +11,13 @@
 - [x] Cập nhật thông tin bài tập (đầu vào, đầu ra, giới hạn thời gian/bộ nhớ, interactive hay không).
 - [x] Bật tính điểm cho bài tập.
 - [x] Tải lên đề cho bài tập.
-- [ ] Tải lên tài nguyên cho đề bài.
+- [x] Tải lên tài nguyên cho đề bài.
 - [x] Tải lên lời giải cho bài tập.
 - [x] Tải lên tệp (hiện tại chỉ hỗ trợ tải lên **source file**)
 - [x] Chọn trình chấm (checker) có sẵn hoặc đã tải lên dưới dạng **source file**.
 - [x] Chọn trình kiểm tra (validator) đã tải lên dưới dạng **source file**.
-- [ ] Tải lên bộ kiểm thử (test) cho bài tập.
-- [ ] Tạo commit cho bài tập.
+- [x] Tải lên bộ kiểm thử (test) cho bài tập.
+- [x] Tạo commit cho bài tập.
 - [ ] Tạo invocation cho bài tập.
 
 ## Cài đặt
