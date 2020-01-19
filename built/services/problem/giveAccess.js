@@ -1,4 +1,5 @@
 const requester = require("../init-requester");
+Object.defineProperty(exports, "__esModule", { value: true });
 async function giveAccess(problemId, userName, permission = 'Read') {
     let polygonRequester = await requester;
 
@@ -25,4 +26,4 @@ async function giveAccess(problemId, userName, permission = 'Read') {
         }
     }
 }
-module.exports = giveAccess;
+exports.giveAccess = giveAccess;

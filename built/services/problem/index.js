@@ -25,4 +25,4 @@ exports.saveTest = saveTest_1.saveTest;
 const giveAccess_1 = require("./giveAccess");
 exports.giveAccess = giveAccess_1.giveAccess;
 const commitChanges_1 = require("./commitChanges");
-exports.commitChanges = giveAccess_1.commitChanges_1;
+exports.commitChanges = commitChanges_1.commitChanges;
