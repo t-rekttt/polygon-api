@@ -68,7 +68,7 @@ class PolygonRequester {
     }
 
     makeQueryString(query = {}) {
-        return Object.keys(query).sort().reduce((curr, key) => curr + `&${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`, '').slice(1);
+        return Object.keys(query).sort().reduce((curr, key) => curr + `&${key}=${query[key]}`, '').slice(1);
     }
 
     makeApiSig(methodName, query, secret) {
