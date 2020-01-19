@@ -57,14 +57,14 @@ class PolygonRequester {
         return this.request(methodName, options);
     }
 
-    async requestOfficial(methodName, options = { formData: {}, method: 'POST' }) {
+    async requestOfficial(methodName, options = { formData: {} }) {
         let formData = {
             apiKey: this.API_KEY,
             time: Math.round(new Date().getTime() / 1000).toString(),
             ...options.formData
         };
-        formData['apiSig'] = this.makeApiSig(methodName, this.makeQueryString(formData), this.API_SECRET);
-        return this.request(`api/${methodName}`, { ...options, formData });
+        formData.apiSig = this.makeApiSig(methodName, this.makeQueryString(formData), this.API_SECRET);
+        return this.request(`api/${methodName}`, { ...options, method: 'POST', formData });
     }
 
     makeQueryString(query = {}) {
