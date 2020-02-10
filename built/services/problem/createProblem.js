@@ -4,22 +4,17 @@ const requester = require("../init-requester");
 async function createProblem(problemName) {
     let polygonRequester = await requester;
 
-    while (true) {
-        try {
-            const formData = {
-                name: problemName.toLowerCase(),
-                submit: 'Create',
-                submitted: 'true'
-            };
 
-            const response = await polygonRequester.requestUnofficial('cp', { formData });
+    const formData = {
+        name: problemName.toLowerCase(),
+        submit: 'Create',
+        submitted: 'true'
+    };
 
-            return {
-                success: response.headers.location.indexOf('/problems') !== -1
-            };
-        } catch (err) {
-            console.log(err);
-        }
-    }
+    const response = await polygonRequester.requestUnofficial('cp', { formData });
+
+    return {
+        success: response.headers.location.indexOf('/problems') !== -1
+    };
 }
 exports.createProblem = createProblem;

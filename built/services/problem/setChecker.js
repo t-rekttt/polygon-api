@@ -4,17 +4,11 @@ const requester = require("../init-requester");
 async function setChecker(problemId, { checker }) {
     let polygonRequester = await requester;
 
-    while (true) {
-        try {
-            const formData = {
-                problemId,
-                checker
-            };
-            const { body } = await polygonRequester.requestOfficial('problem.setChecker', formData);
-            return body && body.status === 'OK';
-        } catch (err) {
-            console.log(err);
-        }
-    }
+    const formData = {
+        problemId,
+        checker
+    };
+    const { body } = await polygonRequester.requestOfficial('problem.setChecker', formData);
+    return body && body.status === 'OK';
 }
 exports.setChecker = setChecker;

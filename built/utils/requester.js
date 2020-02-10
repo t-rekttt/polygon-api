@@ -20,7 +20,7 @@ class PolygonRequester {
             resolveWithFullResponse: true,
             followRedirect: false,
             jar: true,
-            // proxy: 'http://localhost:8080',
+            // proxy: 'http://localhost:8888',
             // strictSSL: false
         });
     }
@@ -51,28 +51,51 @@ class PolygonRequester {
         return this;
     }
 
-    async requestUnofficial(methodName = '', options = { formData: {}, qs: {} }) {
-        if (!options.formData.session) options.formData = { ...options.formData, session: await this.getSessionId(options.formData.problemId) };
-        options.qs = { ...options.qs, ccid: this.ccid };
-        return this.request(methodName, options);
+    async requestUnofficial(methodName = '', options = { formData: {}, qs: {} }, retries = 5, currentRetry = 1) {
+        if (currentRetry > retries) throw new Error('Retries limit exceeded');
+
+        try {
+            if (!options.formData.session) options.formData = { ...options.formData, session: await this.getSessionId(options.formData.problemId) };
+
+            options.formData = this.filterFormData(options.formData);
+
+            options.qs = { ...options.qs, ccid: this.ccid };
+            return this.request(methodName, options);
+        } catch (err) {
+            console.log(err);
+            return this.requestUnofficial(methodName, options, retries, ++currentRetry);
+        }
     }
 
-    async requestOfficial(methodName, options = { formData: {} }) {
-        let formData = {
-            apiKey: this.API_KEY,
-            time: Math.round(new Date().getTime() / 1000).toString(),
-            ...options.formData
-        };
-        formData.apiSig = this.makeApiSig(methodName, this.makeQueryString(formData), this.API_SECRET);
-        return this.request(`api/${methodName}`, { ...options, method: 'POST', formData });
+    async requestOfficial(methodName, options = { formData: {} }, retries = 5, currentRetry = 1) {
+        if (currentRetry > retries) throw new Error('Retries limit exceeded');
+
+        try {
+            let formData = {
+                apiKey: this.API_KEY,
+                time: Math.round(new Date().getTime() / 1000).toString(),
+                ...options.formData
+            };
+
+            options.formData = this.filterFormData(options.formData);
+
+            formData.apiSig = this.makeApiSig(methodName, this.makeQueryString(formData), this.API_SECRET);
+            return this.request(`api/${methodName}`, { ...options, method: 'POST', formData });
+        } catch (err) {
+            return this.requestOfficial(methodName, options, retries, ++currentRetry);
+        }
     }
 
-    async getSessionId(problemId) {
-        const continueEditRequest = await this.request('edit-start', { method: 'POST', formData: { problemId }, qs: { ccid: this.ccid } });
+    async getSessionId(problemId, retries = 5, currentRetry = 1) {
+        if (currentRetry > retries) throw new Error('Retries limit exceeded');
 
-        let session = new URL(continueEditRequest.headers.location).searchParams.get('session');
+        try {
+            const continueEditRequest = await this.request('edit-start', { method: 'POST', formData: { problemId }, qs: { ccid: this.ccid } });
 
-        return session;
+            return new URL(continueEditRequest.headers.location).searchParams.get('session');
+        } catch (err) {
+            return this.getSessionId(problemId, retries, ++currentRetry)
+        }
     }
 
     makeQueryString(query = {}) {
@@ -93,6 +116,14 @@ class PolygonRequester {
     extractCCID(text) {
         const match = text.match(/name="ccid" content="(.*?)"/);
         return { ccid: match ? match[1] : null };
+    }
+
+    filterFormData(formData) {
+        return Object.keys(formData).reduce((curr, k) => {
+            if (formData[k]) curr[k] = formData[k];
+
+            return curr;
+        }, {});
     }
 }
 
