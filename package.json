@@ -11,6 +11,7 @@
     "@types/jssha": "^2.0.0",
     "@types/request": "^2.48.4",
     "@types/request-promise": "^4.1.45",
+    "cheerio": "^1.0.0-rc.3",
     "dotenv": "^8.2.0",
     "js-sha512": "^0.8.0",
     "jssha": "^2.3.1",

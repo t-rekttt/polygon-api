@@ -8,7 +8,8 @@ async function setChecker(problemId, { checker }) {
         problemId,
         checker
     };
-    const { body } = await polygonRequester.requestOfficial('problem.setChecker', formData);
+
+    const { body } = await polygonRequester.requestOfficial('problem.setChecker', { formData });
     return body && body.status === 'OK';
 }
 exports.setChecker = setChecker;
