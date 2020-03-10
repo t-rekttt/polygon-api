@@ -20,8 +20,8 @@ class PolygonRequester {
             resolveWithFullResponse: true,
             followRedirect: false,
             jar: true,
-            // proxy: 'http://localhost:8888',
-            // strictSSL: false
+            proxy: 'http://localhost:8888',
+            strictSSL: false
         });
     }
 
@@ -55,9 +55,10 @@ class PolygonRequester {
         if (currentRetry > retries) throw new Error('Retries limit exceeded');
 
         try {
-            if (!options.formData.session) options.formData = { ...options.formData, session: await this.getSessionId(options.formData.problemId) };
+            if (options.method.toUpperCase().trim() === 'POST' && (!options.formData || !options.formData.session)) options.formData = { ...options.formData, session: await this.getSessionId(options.formData.problemId) };
+            else if (!options.qs || !options.qs.session) options.qs = { ...options.qs, session: await this.getSessionId(options.qs.problemId) };
 
-            options.formData = this.filterFormData(options.formData);
+            options.formData = this.filterFormData({ ...options.formData });
 
             options.qs = { ...options.qs, ccid: this.ccid };
             return this.request(methodName, options);

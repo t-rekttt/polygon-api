@@ -40,3 +40,5 @@ const deleteTests_1 = require("./deleteTests");
 exports.deleteTests = deleteTests_1.deleteTests;
 const deleteAllTests_1 = require("./deleteAllTests");
 exports.deleteAllTests = deleteAllTests_1.deleteAllTests;
+const getProblemLinkForCodeforces_1 = require("./getProblemLinkForCodeforces");
+exports.getProblemLinkForCodeforces = getProblemLinkForCodeforces_1.getProblemLinkForCodeforces;
